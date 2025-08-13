@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # ExploreEase - Your Smart Travel Companion
 
 A cross-platform mobile & web app that helps tourists discover destinations, plan itineraries, and book services, while allowing local providers to publish and manage listings.
@@ -267,3 +268,7 @@ For support and questions:
 # easyexplose-
 EasyExplore is an app built with Flutter and based on a user-friendly design that focuses on smooth navigation and interactive features. It leverages Flutter’s cross-platform capabilities to work seamlessly on both Android and iOS devices.
 >>>>>>> f8b14ef09891e4ca02c7141ddecc39f07555f10c
+=======
+# Easyexplore
+EasyExplore is an app built with Flutter and based on a user-friendly design that focuses on smooth navigation and interactive features. It leverages Flutter’s cross-platform capabilities to work seamlessly on both Android and iOS devices.
+>>>>>>> db8514051eacad1281594758fb4c0234f047986e

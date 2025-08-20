@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/booking_provider.dart';
 import 'providers/itinerary_provider.dart';
+import 'providers/somaliland_guide_provider.dart';
 import 'screens/splash_screen.dart';
 import 'utils/app_theme.dart';
 
@@ -26,6 +27,7 @@ class ExploreEaseApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => BookingProvider()),
         ChangeNotifierProvider(create: (_) => ItineraryProvider()),
+        ChangeNotifierProvider(create: (_) => SomalilandGuideProvider()),
       ],
       child: MaterialApp(
         title: 'ExploreEase',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/category_model.dart';
+import '../../utils/app_theme.dart';
 
 class CategoryDetailsPage extends StatelessWidget {
   final Category category;
@@ -25,14 +26,28 @@ class CategoryDetailsPage extends StatelessWidget {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // Hero Background Image
-                  Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(category.imageUrl),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                  // Category header image (asset or network) with fallback
+                  Builder(
+                    builder: (_) {
+                      final url = category.imageUrl;
+                      if (url.startsWith('assets/')) {
+                        return Image.asset(url, fit: BoxFit.cover);
+                      }
+                      if (url.startsWith('http')) {
+                        return Image.network(
+                          url,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            color: Colors.grey[800],
+                            child: const Center(child: Icon(Icons.category, size: 100, color: Colors.white)),
+                          ),
+                        );
+                      }
+                      return Container(
+                        color: Colors.grey[800],
+                        child: const Center(child: Icon(Icons.category, size: 100, color: Colors.white)),
+                      );
+                    },
                   ),
                   // Dark overlay for better text readability
                   Container(
@@ -41,8 +56,8 @@ class CategoryDetailsPage extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.black.withOpacity(0.3),
-                          Colors.black.withOpacity(0.7),
+                          AppTheme.withOpacity(Colors.black, 0.3),
+                          AppTheme.withOpacity(Colors.black, 0.7),
                         ],
                       ),
                     ),
@@ -59,7 +74,7 @@ class CategoryDetailsPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
+                            color: AppTheme.withOpacity(Colors.black, 0.3),
                             blurRadius: 10,
                             offset: const Offset(0, 5),
                           ),
@@ -79,7 +94,7 @@ class CategoryDetailsPage extends StatelessWidget {
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
+                  color: AppTheme.withOpacity(Colors.black, 0.5),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
@@ -264,12 +279,16 @@ class CategoryDetailsPage extends StatelessWidget {
                     size: 24,
                   ),
                   const SizedBox(width: 12),
-                  Text(
-                    'Pro Tips for ${category.name}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue[700],
-                      fontSize: 16,
+                  Expanded(
+                    child: Text(
+                      'Pro Tips for ${category.name}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue[700],
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ],

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../../utils/app_theme.dart';
 
 class CerigaboPage extends StatefulWidget {
   const CerigaboPage({super.key});
@@ -30,13 +32,27 @@ class _CerigaboPageState extends State<CerigaboPage> {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.network(
-                    'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: Colors.grey[800],
-                      child: const Icon(Icons.terrain, size: 100, color: Colors.white),
-                    ),
+                  FutureBuilder<String?>(
+                    future: _firstExistingAsset([
+                      'assets/images/image/erigabo.jpeg',
+                      'assets/images/image/erigabo.jpg',
+                      'assets/images/image/cerigabo.jpeg',
+                      'assets/images/image/cerigabo.jpg',
+                      'assets/images/image/cerigabo.png',
+                      'assets/images/cerigabo_cover.jpg',
+                      'assets/images/cerigabo_cover.jpeg',
+                      'assets/images/cerigabo_cover.png',
+                    ]),
+                    builder: (context, snapshot) {
+                      final path = snapshot.data;
+                      if (path != null) {
+                        return Image.asset(path, fit: BoxFit.cover);
+                      }
+                      return Container(
+                        color: Colors.grey[800],
+                        child: const Center(child: Icon(Icons.terrain, size: 100, color: Colors.white)),
+                      );
+                    },
                   ),
                   Container(
                     decoration: BoxDecoration(
@@ -45,7 +61,7 @@ class _CerigaboPageState extends State<CerigaboPage> {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Colors.black.withOpacity(0.7),
+                          AppTheme.withOpacity(Colors.black, 0.7),
                         ],
                       ),
                     ),
@@ -100,6 +116,22 @@ class _CerigaboPageState extends State<CerigaboPage> {
     );
   }
 
+  Future<bool> _assetExists(String assetPath) async {
+    try {
+      await rootBundle.load(assetPath);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<String?> _firstExistingAsset(List<String> assetPaths) async {
+    for (final path in assetPaths) {
+      if (await _assetExists(path)) return path;
+    }
+    return null;
+  }
+
   Widget _buildSectionHeader(String title, IconData icon) {
     return Row(
       children: [
@@ -126,7 +158,7 @@ class _CerigaboPageState extends State<CerigaboPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: AppTheme.withOpacity(Colors.black, 0.06),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -178,7 +210,7 @@ class _CerigaboPageState extends State<CerigaboPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: AppTheme.withOpacity(Colors.black, 0.06),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),

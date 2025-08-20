@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../utils/app_theme.dart';
 import '../../widgets/custom_button.dart';
 
 class ProviderDashboard extends StatelessWidget {
@@ -263,7 +264,7 @@ class ProviderDashboard extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: AppTheme.withOpacity(color, 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -318,7 +319,7 @@ class ProviderDashboard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: AppTheme.withOpacity(color, 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -366,7 +367,7 @@ class ProviderDashboard extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+            color: AppTheme.withOpacity(Theme.of(context).colorScheme.secondary, 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
@@ -389,7 +390,7 @@ class ProviderDashboard extends StatelessWidget {
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: statusColor.withOpacity(0.1),
+            color: AppTheme.withOpacity(statusColor, 0.1),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: statusColor),
           ),

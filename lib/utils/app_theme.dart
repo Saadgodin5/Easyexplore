@@ -1,5 +1,17 @@
 import 'package:flutter/material.dart';
 
+// Extension method to replace deprecated withOpacity
+extension ColorExtension on Color {
+  Color withValues({int? alpha, int? red, int? green, int? blue}) {
+    return Color.fromARGB(
+      alpha ?? this.alpha,
+      red ?? this.red,
+      green ?? this.green,
+      blue ?? this.blue,
+    );
+  }
+}
+
 class AppTheme {
   // Primary colors
   static const Color primaryColor = Color(0xFF2196F3);
@@ -21,6 +33,11 @@ class AppTheme {
   static const Color darkTextPrimary = Color(0xFFFFFFFF);
   static const Color darkTextSecondary = Color(0xFFB3B3B3);
 
+  // Utility function to replace deprecated withOpacity
+  static Color withOpacity(Color color, double opacity) {
+    return color.withValues(alpha: (opacity * 255).round() / 255.0);
+  }
+
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
@@ -31,7 +48,6 @@ class AppTheme {
         secondary: secondaryColor,
         secondaryContainer: secondaryVariant,
         surface: lightSurface,
-        background: lightBackground,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: lightTextPrimary,
@@ -78,7 +94,6 @@ class AppTheme {
         secondary: secondaryColor,
         secondaryContainer: secondaryVariant,
         surface: darkSurface,
-        background: darkBackground,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: darkTextPrimary,

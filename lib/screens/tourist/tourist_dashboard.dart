@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
+// Removed network image dependency while images are disabled
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/auth_provider.dart';
 import '../auth/login_screen.dart';
+import '../somaliland_travel_guide_screen.dart';
 import 'explore_map_screen.dart';
 import 'profile_screen.dart';
 import 'category_details_page.dart';
@@ -12,7 +16,12 @@ import 'burco_page.dart';
 import 'gabiley_page.dart';
 import 'borama_page.dart';
 import 'cerigabo_page.dart';
+import 'search_screen.dart';
 import '../../models/category_model.dart';
+import '../../models/city_model.dart';
+import '../../widgets/custom_button.dart';
+import 'favorites_screen.dart';
+import 'city_details_page.dart';
 
 class TouristDashboard extends StatefulWidget {
   const TouristDashboard({super.key});
@@ -24,24 +33,39 @@ class TouristDashboard extends StatefulWidget {
 class _TouristDashboardState extends State<TouristDashboard> with TickerProviderStateMixin {
   int _selectedActivityIndex = 0; // 0: Swimming, 1: Diving, 2: Trekking
   final List<_Activity> _activities = const [
-    _Activity('Swimming', Icons.pool, 'https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'),
-    _Activity('Diving', Icons.scuba_diving, 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'),
-    _Activity('Trekking', Icons.hiking, 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'),
+    _Activity('Swimming', Icons.pool, ''),
+    _Activity('Diving', Icons.scuba_diving, ''),
+    _Activity('Trekking', Icons.hiking, ''),
   ];
+
+  List<City> _favoriteCities = [];
+  bool _loadingFavorites = true;
   
-  // City data with image URLs
-  final List<_CityData> _cities = [
-    _CityData('Hargeisa', 'Somaliland', 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'),
-    _CityData('Berbera', 'Somaliland', 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'),
-    _CityData('Burco', 'Somaliland', 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'),
-    _CityData('Gabiley', 'Somaliland', 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'),
-    _CityData('Borama', 'Somaliland', 'https://images.unsplash.com/photo-1514565131-fce0801e5785?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'),
-    _CityData('Cerigabo', 'Somaliland', 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'),
+  // City data; images will be resolved from local assets by name
+  final List<_CityData> _cities = const [
+    _CityData('Hargeisa', 'Somaliland'),
+    _CityData('Berbera', 'Somaliland'),
+    _CityData('Burco', 'Somaliland'),
+    _CityData('Gabiley', 'Somaliland'),
+    _CityData('Borama', 'Somaliland'),
+    _CityData('Cerigabo', 'Somaliland'),
   ];
 
   @override
   void initState() {
     super.initState();
+    _loadFavorites();
+  }
+
+  Future<void> _loadFavorites() async {
+    final prefs = await SharedPreferences.getInstance();
+    final ids = prefs.getStringList('favorite_city_ids') ?? <String>[];
+    final cities = ids.map((id) => SomalilandCities.getById(id)).whereType<City>().toList();
+    if (!mounted) return;
+    setState(() {
+      _favoriteCities = cities;
+      _loadingFavorites = false;
+    });
   }
 
   @override
@@ -63,16 +87,23 @@ class _TouristDashboardState extends State<TouristDashboard> with TickerProvider
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // Hero Background Image
-                  Container(
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(
-                          'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-                        ),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                  // Dashboard hero using Hargeisa cover asset when available (jpg or png)
+                  FutureBuilder<String?>(
+                    future: _firstExistingAsset([
+                      'assets/images/hargeisa_cover.jpg',
+                      'assets/images/hargeisa_cover.png',
+                    ]),
+                    builder: (context, snapshot) {
+                      final String? path = snapshot.data;
+                      if (path != null) {
+                        return Image.asset(path, fit: BoxFit.cover);
+                      }
+                      return Container(
+                        color: Colors.grey[300],
+                        alignment: Alignment.center,
+                        child: const Icon(Icons.landscape, size: 72, color: Colors.white70),
+                      );
+                    },
                   ),
                   // Dark overlay for better text readability
                   Container(
@@ -92,35 +123,43 @@ class _TouristDashboardState extends State<TouristDashboard> with TickerProvider
                     top: 100,
                     left: 20,
                     right: 20,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(25),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.search,
-                            color: Colors.grey[600],
-                            size: 24,
-                          ),
-                          const SizedBox(width: 15),
-                          Text(
-                            'Where do you want to go?',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 16,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const SearchScreen()),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(25),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.search,
+                              color: Colors.grey[600],
+                              size: 24,
+                            ),
+                            const SizedBox(width: 15),
+                            Text(
+                              'Where do you want to go?',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -128,6 +167,25 @@ class _TouristDashboardState extends State<TouristDashboard> with TickerProvider
               ),
             ),
             actions: [
+              IconButton(
+                icon: const Icon(Icons.search, color: Colors.white),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SearchScreen()),
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.favorite, color: Colors.white),
+                tooltip: 'Favorites',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const FavoritesScreen()),
+                  );
+                },
+              ),
               IconButton(
                 icon: const Icon(Icons.notifications, color: Colors.white),
                 onPressed: () {
@@ -159,6 +217,105 @@ class _TouristDashboardState extends State<TouristDashboard> with TickerProvider
               ),
               child: Column(
                 children: [
+                  // Saved (Favorites) Section
+                  if (!_loadingFavorites && _favoriteCities.isNotEmpty) ...[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'SAVED',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[800],
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const FavoritesScreen()),
+                              );
+                              _loadFavorites();
+                            },
+                            child: const Text('View all'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 170,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.only(left: 20, right: 20, top: 12),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _favoriteCities.length.clamp(0, 10),
+                        itemBuilder: (context, index) {
+                          final city = _favoriteCities[index];
+                          return GestureDetector(
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => CityDetailsPage(city: city)),
+                              );
+                              _loadFavorites();
+                            },
+                            child: Container(
+                              width: 130,
+                              margin: EdgeInsets.only(right: index == _favoriteCities.length - 1 ? 0 : 12),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(14),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.06),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                                border: Border.all(color: Colors.grey.withValues(alpha: 0.15)),
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    height: 90,
+                                    width: double.infinity,
+                                    color: Colors.grey[200],
+                                    alignment: Alignment.center,
+                                    child: const Icon(Icons.photo, color: Colors.grey),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          city.name,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(fontWeight: FontWeight.w600),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          city.region,
+                                          style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                   // Guest Mode Banner
                   if (Provider.of<AuthProvider>(context, listen: false).isGuestUser) ...[
                     Container(
@@ -263,6 +420,62 @@ class _TouristDashboardState extends State<TouristDashboard> with TickerProvider
                   
                   const SizedBox(height: 30),
                   
+                  // Somaliland Travel Guide Button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.flag, color: Theme.of(context).colorScheme.primary),
+                            const SizedBox(width: 8),
+                            Text(
+                              'COMPLETE TRAVEL GUIDE',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[800],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: CustomButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const SomalilandTravelGuideScreen(),
+                                ),
+                              );
+                            },
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Colors.white,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.flag, size: 20),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Explore Somaliland Travel Guide',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 30),
+                  
                   // Popular Cities Section
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -293,7 +506,7 @@ class _TouristDashboardState extends State<TouristDashboard> with TickerProvider
                             itemCount: _cities.length,
                             itemBuilder: (context, index) {
                               final city = _cities[index];
-                              return _buildSomalilandCityCard(city.name, city.imageUrl);
+                              return _buildSomalilandCityCard(city.name, '');
                             },
                           ),
                         ),
@@ -343,14 +556,10 @@ class _TouristDashboardState extends State<TouristDashboard> with TickerProvider
                           child: Stack(
                             fit: StackFit.expand,
                             children: [
-                              // Placeholder Somaliland map image (user can replace)
-                              Image.network(
-                                'https://images.unsplash.com/photo-1524661135-4231f37799d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Container(
-                                  color: Colors.grey[200],
-                                  child: const Center(child: Icon(Icons.map, size: 64, color: Colors.grey)),
-                                ),
+                              // Placeholder Somaliland map area (no network image)
+                              Container(
+                                color: Colors.grey[200],
+                                child: const Center(child: Icon(Icons.map, size: 64, color: Colors.grey)),
                               ),
                               Positioned(
                                 right: 12,
@@ -418,7 +627,7 @@ class _TouristDashboardState extends State<TouristDashboard> with TickerProvider
                                   onTap: () => setState(() => _selectedActivityIndex = index),
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 220),
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                                     decoration: BoxDecoration(
                                       color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey[100],
                                       borderRadius: BorderRadius.circular(14),
@@ -426,13 +635,19 @@ class _TouristDashboardState extends State<TouristDashboard> with TickerProvider
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(activity.icon, size: 18, color: isSelected ? Colors.white : Colors.grey[700]),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          activity.title,
-                                          style: TextStyle(
-                                            color: isSelected ? Colors.white : Colors.grey[800],
-                                            fontWeight: FontWeight.w600,
+                                        Icon(activity.icon, size: 14, color: isSelected ? Colors.white : Colors.grey[700]),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            activity.title,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: isSelected ? Colors.white : Colors.grey[800],
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -450,31 +665,14 @@ class _TouristDashboardState extends State<TouristDashboard> with TickerProvider
                             duration: const Duration(milliseconds: 300),
                             switchInCurve: Curves.easeOut,
                             switchOutCurve: Curves.easeIn,
-                            child: _activities[_selectedActivityIndex].isNetworkImage
-                                ? Image.network(
-                                    _activities[_selectedActivityIndex].imagePath,
-                                    key: ValueKey(_activities[_selectedActivityIndex].imagePath),
-                                    height: 220,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => Container(
-                                      height: 220,
-                                      color: Colors.grey[200],
-                                      child: const Center(child: Icon(Icons.image, size: 48, color: Colors.grey)),
-                                    ),
-                                  )
-                                : Image.asset(
-                                    _activities[_selectedActivityIndex].imagePath,
-                                    key: ValueKey(_activities[_selectedActivityIndex].imagePath),
-                                    height: 220,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => Container(
-                                      height: 220,
-                                      color: Colors.grey[200],
-                                      child: const Center(child: Icon(Icons.image, size: 48, color: Colors.grey)),
-                                    ),
-                                  ),
+                            child: Container(
+                              key: ValueKey(_activities[_selectedActivityIndex].title),
+                              height: 220,
+                              width: double.infinity,
+                              color: Colors.grey[200],
+                              alignment: Alignment.center,
+                              child: Icon(_activities[_selectedActivityIndex].icon, size: 64, color: Colors.grey[600]),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -667,30 +865,45 @@ class _TouristDashboardState extends State<TouristDashboard> with TickerProvider
                 height: 80,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(40),
-                  image: DecorationImage(
-                    image: NetworkImage(imageUrl),
-                    fit: BoxFit.cover,
-                  ),
                   boxShadow: [
                     BoxShadow(
-                                                  color: Colors.black.withValues(alpha: 0.15),
+                      color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 6,
                       offset: const Offset(0, 3),
                     ),
                   ],
                 ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(40),
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                                              colors: [
-                          Colors.transparent,
-                          Colors.black.withValues(alpha: 0.3),
-                        ],
+                clipBehavior: Clip.antiAlias,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    FutureBuilder<String?>(
+                      future: _firstExistingAsset(_imageCandidatesForCity(cityName)),
+                      builder: (context, snapshot) {
+                        final path = snapshot.data;
+                        if (path != null) {
+                          return Image.asset(path, fit: BoxFit.cover);
+                        }
+                        return Container(
+                          color: Colors.grey[300],
+                          alignment: Alignment.center,
+                          child: const Icon(Icons.image, color: Colors.grey),
+                        );
+                      },
                     ),
-                  ),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withValues(alpha: 0.3),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 6),
@@ -710,6 +923,52 @@ class _TouristDashboardState extends State<TouristDashboard> with TickerProvider
     );
   }
 
+  List<String> _imageCandidatesForCity(String cityName) {
+    final String lower = cityName.toLowerCase();
+    // Keep Hargeisa dedicated cover (user already set)
+    if (cityName == 'Hargeisa') {
+      return [
+        'assets/images/hargeisa_cover.jpg',
+        'assets/images/hargeisa_cover.jpeg',
+        'assets/images/hargeisa_cover.png',
+        'assets/images/image/Hargeisa somaliland.jpeg',
+      ];
+    }
+
+    final List<String> candidates = [
+      // User-uploaded folder first
+      'assets/images/image/${lower}.jpeg',
+      'assets/images/image/${lower}.jpg',
+      'assets/images/image/${lower}.png',
+      // Project fallbacks
+      'assets/images/${lower}_cover.jpg',
+      'assets/images/${lower}_cover.jpeg',
+      'assets/images/${lower}_cover.png',
+    ];
+
+    // Special filename cases found in assets/images/image/
+    if (cityName == 'Cerigabo') {
+      candidates.insertAll(0, [
+        'assets/images/image/erigabo.jpeg',
+        'assets/images/image/erigabo.jpg',
+      ]);
+    }
+    if (cityName == 'Gabiley') {
+      candidates.insert(0, 'assets/images/image/Gabiley.jpeg');
+    }
+    if (cityName == 'Berbera') {
+      candidates.insert(0, 'assets/images/image/berbera.jpeg');
+    }
+    if (cityName == 'Borama') {
+      candidates.insert(0, 'assets/images/image/borama.jpeg');
+    }
+    if (cityName == 'Burco') {
+      candidates.insert(0, 'assets/images/image/burco.jpeg');
+    }
+
+    return candidates;
+  }
+
   void _showCityInfo(BuildContext context, String cityName, String imageUrl) {
     showDialog(
       context: context,
@@ -725,16 +984,12 @@ class _TouristDashboardState extends State<TouristDashboard> with TickerProvider
               // City image header
               ClipRRect(
                 borderRadius: BorderRadius.circular(15),
-                child: Image.network(
-                  imageUrl,
+                child: Container(
                   height: 120,
                   width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    height: 120,
-                    color: Colors.grey[200],
-                    child: const Icon(Icons.image, size: 48, color: Colors.grey),
-                  ),
+                  color: Colors.grey[200],
+                  alignment: Alignment.center,
+                  child: const Icon(Icons.image, size: 48, color: Colors.grey),
                 ),
               ),
               const SizedBox(height: 16),
@@ -802,6 +1057,24 @@ class _TouristDashboardState extends State<TouristDashboard> with TickerProvider
 
 }
 
+extension _AssetCheck on _TouristDashboardState {
+  Future<bool> _assetExists(String assetPath) async {
+    try {
+      await rootBundle.load(assetPath);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<String?> _firstExistingAsset(List<String> assetPaths) async {
+    for (final path in assetPaths) {
+      if (await _assetExists(path)) return path;
+    }
+    return null;
+  }
+}
+
 class _Activity {
   final String title;
   final IconData icon;
@@ -814,6 +1087,5 @@ class _Activity {
 class _CityData {
   final String name;
   final String country;
-  final String imageUrl;
-  const _CityData(this.name, this.country, this.imageUrl);
+  const _CityData(this.name, this.country);
 }

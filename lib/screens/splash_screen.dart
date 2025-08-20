@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../models/user_model.dart';
-import 'auth/login_screen.dart';
+import '../utils/app_theme.dart';
 import 'tourist/tourist_dashboard.dart';
 import 'provider/provider_dashboard.dart';
 
@@ -66,9 +66,13 @@ class _SplashScreenState extends State<SplashScreen>
         );
       }
     } else {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
+      // Auto enter guest mode for smooth preview of the app
+      authProvider.enterGuestMode().then((_) {
+        if (!mounted) return;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const TouristDashboard()),
+        );
+      });
     }
   }
 
@@ -104,7 +108,7 @@ class _SplashScreenState extends State<SplashScreen>
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: AppTheme.withOpacity(Colors.black, 0.1),
                                 blurRadius: 20,
                                 offset: const Offset(0, 10),
                               ),
@@ -136,7 +140,7 @@ class _SplashScreenState extends State<SplashScreen>
                           'Your Smart Travel Companion',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.white.withOpacity(0.9),
+                            color: AppTheme.withOpacity(Colors.white, 0.9),
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -146,7 +150,7 @@ class _SplashScreenState extends State<SplashScreen>
                         // Loading indicator
                         CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white.withOpacity(0.8),
+                            AppTheme.withOpacity(Colors.white, 0.8),
                           ),
                         ),
                         
@@ -157,9 +161,10 @@ class _SplashScreenState extends State<SplashScreen>
                           builder: (context, authProvider, child) {
                             return TextButton(
                               onPressed: () async {
+                                final navigator = Navigator.of(context);
                                 await authProvider.enterGuestMode();
                                 if (mounted) {
-                                  Navigator.of(context).pushReplacement(
+                                  navigator.pushReplacement(
                                     MaterialPageRoute(
                                       builder: (_) => const TouristDashboard(),
                                     ),
@@ -172,7 +177,7 @@ class _SplashScreenState extends State<SplashScreen>
                               child: Text(
                                 'Skip Login',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: AppTheme.withOpacity(Colors.white, 0.8),
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -195,7 +200,7 @@ class _SplashScreenState extends State<SplashScreen>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.3),
+                color: AppTheme.withOpacity(Colors.black, 0.3),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(

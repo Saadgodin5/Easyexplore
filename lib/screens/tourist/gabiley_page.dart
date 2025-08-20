@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../../utils/app_theme.dart';
 
 class GabileyPage extends StatefulWidget {
   const GabileyPage({super.key});
@@ -30,13 +32,26 @@ class _GabileyPageState extends State<GabileyPage> {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.network(
-                    'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: Colors.grey[800],
-                      child: const Icon(Icons.eco, size: 100, color: Colors.white),
-                    ),
+                  FutureBuilder<String?>(
+                    future: _firstExistingAsset([
+                      'assets/images/image/Gabiley.jpeg',
+                      'assets/images/image/gabiley.jpeg',
+                      'assets/images/image/gabiley.jpg',
+                      'assets/images/image/gabiley.png',
+                      'assets/images/gabiley_cover.jpg',
+                      'assets/images/gabiley_cover.jpeg',
+                      'assets/images/gabiley_cover.png',
+                    ]),
+                    builder: (context, snapshot) {
+                      final path = snapshot.data;
+                      if (path != null) {
+                        return Image.asset(path, fit: BoxFit.cover);
+                      }
+                      return Container(
+                        color: Colors.grey[800],
+                        child: const Center(child: Icon(Icons.eco, size: 100, color: Colors.white)),
+                      );
+                    },
                   ),
                   Container(
                     decoration: BoxDecoration(
@@ -45,7 +60,7 @@ class _GabileyPageState extends State<GabileyPage> {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Colors.black.withOpacity(0.7),
+                          AppTheme.withOpacity(Colors.black, 0.7),
                         ],
                       ),
                     ),
@@ -100,6 +115,22 @@ class _GabileyPageState extends State<GabileyPage> {
     );
   }
 
+  Future<bool> _assetExists(String assetPath) async {
+    try {
+      await rootBundle.load(assetPath);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<String?> _firstExistingAsset(List<String> assetPaths) async {
+    for (final path in assetPaths) {
+      if (await _assetExists(path)) return path;
+    }
+    return null;
+  }
+
   Widget _buildSectionHeader(String title, IconData icon) {
     return Row(
       children: [
@@ -126,7 +157,7 @@ class _GabileyPageState extends State<GabileyPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: AppTheme.withOpacity(Colors.black, 0.06),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -178,7 +209,7 @@ class _GabileyPageState extends State<GabileyPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: AppTheme.withOpacity(Colors.black, 0.06),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),

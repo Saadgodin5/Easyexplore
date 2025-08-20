@@ -26,7 +26,7 @@ class SomalilandCategories {
       name: 'Historical Sites & Landmarks',
       icon: Icons.account_balance,
       description: 'Discover the rich history of Somaliland through ancient ruins, historical monuments, and significant landmarks that tell the story of this remarkable region.',
-      imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+      imageUrl: 'assets/images/hargeisa_cover.jpg',
       color: Colors.blue,
     ),
     Category(

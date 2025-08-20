@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../../utils/app_theme.dart';
 
 class HargeisaPage extends StatefulWidget {
   const HargeisaPage({super.key});
@@ -46,6 +48,43 @@ class _HargeisaPageState extends State<HargeisaPage> {
     ]
   };
 
+  // Hotel data
+  final List<Map<String, dynamic>> _hotels = [
+    {
+      'name': 'Hargeisa Grand Hotel',
+      'description': 'Luxury hotel in the heart of Hargeisa with modern amenities and excellent service.',
+      'price': '\$80/night',
+      'rating': '4.8',
+      'address': 'Central Hargeisa, near Independence Avenue',
+      'contact': '+252 63 4454000',
+      'website': 'https://hargeisagrand.com',
+      'image': 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+      'amenities': ['Wi-Fi', 'Restaurant', 'Spa', 'Conference Room', 'Airport Shuttle', 'Pool'],
+    },
+    {
+      'name': 'Somaliland Plaza Hotel',
+      'description': 'Contemporary hotel offering comfort and convenience for business and leisure travelers.',
+      'price': '\$65/night',
+      'rating': '4.5',
+      'address': 'Plaza District, Hargeisa',
+      'contact': '+252 63 4422224',
+      'website': 'https://somalilandplaza.com',
+      'image': 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+      'amenities': ['Wi-Fi', 'Restaurant', 'Bar', 'Fitness Center', 'Business Center', 'Laundry'],
+    },
+    {
+      'name': 'Ambassador Hotel Hargeisa',
+      'description': 'Historic hotel known for its traditional architecture and warm hospitality.',
+      'price': '\$55/night',
+      'rating': '4.3',
+      'address': 'Ambassador Street, Hargeisa',
+      'contact': '+252 63 4455666',
+      'website': 'https://ambassadorhotelhargeisa.com',
+      'image': 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+      'amenities': ['Wi-Fi', 'Restaurant', 'Garden', 'Traditional Decor', 'Local Cuisine'],
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,15 +108,8 @@ class _HargeisaPageState extends State<HargeisaPage> {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // Hargeisa Cover Image
-                  Image.network(
-                    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: Colors.grey[800],
-                      child: const Icon(Icons.location_city, size: 100, color: Colors.white),
-                    ),
-                  ),
+                  // Cover image from assets with pre-check to avoid asset error logs
+                  _buildHeaderAssetOrPlaceholder(),
                   // Gradient Overlay
                   Container(
                     decoration: BoxDecoration(
@@ -86,7 +118,7 @@ class _HargeisaPageState extends State<HargeisaPage> {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Colors.black.withOpacity(0.7),
+                          AppTheme.withOpacity(Colors.black, 0.7),
                         ],
                       ),
                     ),
@@ -136,7 +168,14 @@ class _HargeisaPageState extends State<HargeisaPage> {
 
                   const SizedBox(height: 30),
 
-                  // 4. Feedback Section
+                  // 4. Hotels Section
+                  _buildSectionHeader('Top Hotels & Accommodations', Icons.hotel),
+                  const SizedBox(height: 16),
+                  _buildHotelsSection(),
+
+                  const SizedBox(height: 30),
+
+                  // 5. Feedback Section
                   _buildSectionHeader('Guest Reviews & Feedback', Icons.rate_review),
                   const SizedBox(height: 16),
                   _buildFeedbackSection(),
@@ -156,47 +195,24 @@ class _HargeisaPageState extends State<HargeisaPage> {
       children: [
         Icon(icon, color: Theme.of(context).colorScheme.primary, size: 28),
         const SizedBox(width: 12),
-        Text(
-          title.toUpperCase(),
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.grey[800],
-            letterSpacing: 0.5,
+        Expanded(
+          child: Text(
+            title.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[800],
+              letterSpacing: 0.5,
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: Colors.grey[600]),
-          const SizedBox(width: 12),
-          Text(
-            '$label: ',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Removed unused _buildInfoRow while images are disabled
 
 
 
@@ -208,7 +224,7 @@ class _HargeisaPageState extends State<HargeisaPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: AppTheme.withOpacity(Colors.black, 0.06),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -220,16 +236,11 @@ class _HargeisaPageState extends State<HargeisaPage> {
           // Hotel Image
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: Image.network(
-              hotel['image'],
+            child: Container(
               height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                height: 200,
-                color: Colors.grey[200],
-                child: const Icon(Icons.hotel, size: 48, color: Colors.grey),
-              ),
+              color: Colors.grey[200],
+              alignment: Alignment.center,
+              child: const Icon(Icons.hotel, size: 48, color: Colors.grey),
             ),
           ),
           
@@ -396,6 +407,12 @@ class _HargeisaPageState extends State<HargeisaPage> {
     );
   }
 
+  Widget _buildHotelsSection() {
+    return Column(
+      children: _hotels.map((hotel) => _buildHotelCard(hotel)).toList(),
+    );
+  }
+
   Widget _buildCarRentalsSection() {
     final carRentals = [
       {
@@ -435,7 +452,7 @@ class _HargeisaPageState extends State<HargeisaPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: AppTheme.withOpacity(Colors.black, 0.06),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -447,16 +464,11 @@ class _HargeisaPageState extends State<HargeisaPage> {
           // Car Image
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: Image.network(
-              carRental['image'],
+            child: Container(
               height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                height: 200,
-                color: Colors.grey[200],
-                child: const Icon(Icons.directions_car, size: 48, color: Colors.grey),
-              ),
+              color: Colors.grey[200],
+              alignment: Alignment.center,
+              child: const Icon(Icons.directions_car, size: 48, color: Colors.grey),
             ),
           ),
           
@@ -610,7 +622,7 @@ class _HargeisaPageState extends State<HargeisaPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: AppTheme.withOpacity(Colors.black, 0.06),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -651,7 +663,7 @@ class _HargeisaPageState extends State<HargeisaPage> {
                 const SizedBox(height: 16),
               ],
             );
-          }).toList(),
+          }),
         ],
       ),
     );
@@ -898,5 +910,45 @@ class _HargeisaPageState extends State<HargeisaPage> {
   void dispose() {
     _feedbackController.dispose();
     super.dispose();
+  }
+
+  // Attempts to load the Hargeisa cover; if missing, shows a placeholder without logging asset errors
+  Widget _buildHeaderAssetOrPlaceholder() {
+            const List<String> candidates = [
+          'assets/images/hargeisa_cover.jpg',
+          'assets/images/hargeisa_cover.jpeg',
+          'assets/images/hargeisa_cover.png',
+        ];
+    return FutureBuilder<String?>(
+      future: _firstExistingAsset(candidates),
+      builder: (context, snapshot) {
+        final String? path = snapshot.data;
+        if (path != null) {
+          return Image.asset(path, fit: BoxFit.cover);
+        }
+        return Container(
+          color: Colors.grey[800],
+          child: const Center(
+            child: Icon(Icons.location_city, size: 100, color: Colors.white),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<bool> _assetExists(String assetPath) async {
+    try {
+      await rootBundle.load(assetPath);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<String?> _firstExistingAsset(List<String> assetPaths) async {
+    for (final path in assetPaths) {
+      if (await _assetExists(path)) return path;
+    }
+    return null;
   }
 }

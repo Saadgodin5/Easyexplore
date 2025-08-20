@@ -1,13 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/city_model.dart';
 
-class CityDetailsPage extends StatelessWidget {
+class CityDetailsPage extends StatefulWidget {
   final City city;
 
   const CityDetailsPage({
     super.key,
     required this.city,
   });
+
+  @override
+  State<CityDetailsPage> createState() => _CityDetailsPageState();
+}
+
+class _CityDetailsPageState extends State<CityDetailsPage> {
+  bool _isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFavoriteStatus();
+  }
+
+  Future<void> _loadFavoriteStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final favoriteIds = prefs.getStringList('favorite_city_ids') ?? <String>[];
+    if (mounted) {
+      setState(() {
+        _isFavorite = favoriteIds.contains(widget.city.id);
+      });
+    }
+  }
+
+  Future<void> _toggleFavorite() async {
+    final prefs = await SharedPreferences.getInstance();
+    final favoriteIds = prefs.getStringList('favorite_city_ids') ?? <String>[];
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
+    if (_isFavorite) {
+      if (!favoriteIds.contains(widget.city.id)) {
+        favoriteIds.add(widget.city.id);
+      }
+    } else {
+      favoriteIds.remove(widget.city.id);
+    }
+    await prefs.setStringList('favorite_city_ids', favoriteIds);
+  }
+
+  Future<void> _shareCity() async {
+    final text = 'Check out ${widget.city.name} in ${widget.city.region}!\n\n${widget.city.description}\n\nShared via ExploreEase';
+    await Share.share(text, subject: 'Explore ${widget.city.name}');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,18 +67,46 @@ class CityDetailsPage extends StatelessWidget {
             pinned: true,
             backgroundColor: Colors.transparent,
             elevation: 0,
+            actions: [
+              IconButton(
+                tooltip: 'Share ${widget.city.name}',
+                onPressed: _shareCity,
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 128),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Icon(Icons.share, color: Colors.white, size: 20),
+                ),
+              ),
+              IconButton(
+                tooltip: _isFavorite ? 'Remove from favorites' : 'Add to favorites',
+                onPressed: _toggleFavorite,
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 128),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Icon(
+                    _isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: _isFavorite ? Colors.redAccent : Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // Hero Background Image
+                  // Placeholder header image (images disabled for now)
                   Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(city.imageUrl),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                    color: Colors.grey[300],
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.location_city, size: 72, color: Colors.grey),
                   ),
                   // Dark overlay for better text readability
                   Container(
@@ -41,8 +115,8 @@ class CityDetailsPage extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.black.withOpacity(0.3),
-                          Colors.black.withOpacity(0.7),
+                          Colors.black.withValues(alpha: 77),
+                          Colors.black.withValues(alpha: 179),
                         ],
                       ),
                     ),
@@ -55,7 +129,7 @@ class CityDetailsPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          city.name,
+                          widget.city.name,
                           style: const TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
@@ -63,7 +137,7 @@ class CityDetailsPage extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          city.region,
+                          widget.city.region,
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white.withOpacity(0.9),
@@ -79,7 +153,7 @@ class CityDetailsPage extends StatelessWidget {
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 128),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
@@ -106,7 +180,7 @@ class CityDetailsPage extends StatelessWidget {
                   children: [
                     // City Description
                     Text(
-                      city.description,
+                      widget.city.description,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: Colors.grey[600],
                         height: 1.6,
@@ -162,9 +236,9 @@ class CityDetailsPage extends StatelessWidget {
             mainAxisSpacing: 15,
             childAspectRatio: 2.5,
           ),
-          itemCount: city.highlights.length,
+          itemCount: widget.city.highlights.length,
           itemBuilder: (context, index) {
-            return _buildHighlightCard(city.highlights[index], index);
+            return _buildHighlightCard(widget.city.highlights[index], index);
           },
         ),
       ],
@@ -252,11 +326,34 @@ class CityDetailsPage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            '${city.name} is located in the ${city.region} region of Somaliland. This region is known for its unique characteristics and contributions to the country\'s culture and economy.',
+            '${widget.city.name} is located in the ${widget.city.region} region of Somaliland. This region is known for its unique characteristics and contributions to the country\'s culture and economy.',
             style: TextStyle(
               color: Colors.green[700],
               fontSize: 14,
               height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Map preview placeholder
+          Container(
+            height: 160,
+            decoration: BoxDecoration(
+              color: Colors.green[100],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.green[200]!),
+            ),
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.map, color: Colors.green[700]),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Map preview coming soon',
+                    style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -296,7 +393,7 @@ class CityDetailsPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Tips for Visiting ${city.name}',
+                    'Tips for Visiting ${widget.city.name}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.blue[700],

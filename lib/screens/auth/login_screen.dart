@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/user_model.dart';
+import '../../utils/app_theme.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 import '../tourist/tourist_dashboard.dart';
@@ -108,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Text(
                         _isSignUp ? 'Create your account' : 'Welcome back!',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                                      color: AppTheme.withOpacity(Theme.of(context).colorScheme.onSurface, 0.7),
                         ),
                       ),
                     ],
@@ -285,13 +286,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Continue as Guest Button
                 Consumer<AuthProvider>(
                   builder: (context, authProvider, child) {
-                    return Container(
+                    return SizedBox(
                       width: double.infinity,
                       child: OutlinedButton(
                         onPressed: authProvider.isLoading ? null : () async {
+                          final navigator = Navigator.of(context);
                           await authProvider.enterGuestMode();
                           if (mounted) {
-                            Navigator.of(context).pushReplacement(
+                            navigator.pushReplacement(
                               MaterialPageRoute(
                                 builder: (_) => const TouristDashboard(),
                               ),
@@ -301,7 +303,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           side: BorderSide(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                            color: AppTheme.withOpacity(Theme.of(context).colorScheme.primary, 0.5),
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),

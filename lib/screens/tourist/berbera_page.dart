@@ -16,25 +16,71 @@ class _BerberaPageState extends State<BerberaPage> {
       {
         'user': 'Amina K.',
         'rating': 5,
-        'comment': 'Beautiful beachfront location with amazing views!',
+        'comment': '🌊 OMG! This place is absolutely STUNNING! The turquoise waters, the gentle sea breeze, and the golden sand - pure paradise! I felt like I was in a dream. The sunset views from my room were breathtaking! 🌅✨',
         'date': '2024-01-15',
-        'reply': 'Thank you Amina! We\'re glad you enjoyed the beach views. - Resort Management'
+        'reply': 'Thank you Amina! We\'re thrilled you experienced the magic of Berbera\'s coastline! 🏖️ - Resort Management'
       },
       {
         'user': 'Khalid M.',
         'rating': 4,
-        'comment': 'Great seafood and friendly staff.',
+        'comment': '🐟 The seafood here hits different! Fresh catch of the day with that ocean breeze - what more could you want? Staff treated us like family. The grilled hammour was *chef\'s kiss* 🤌',
         'date': '2024-01-10',
-        'reply': 'Thank you for your feedback Khalid! - Resort Staff'
+        'reply': 'So happy you loved our fresh seafood, Khalid! Our fishermen bring the best from the Gulf of Aden daily! 🎣 - Resort Staff'
+      },
+      {
+        'user': 'Fatima A.',
+        'rating': 5,
+        'comment': '🏊‍♀️ Living my best life at this beach! Crystal clear waters perfect for swimming, and the vibes are just incredible. Spent hours just floating and soaking up that vitamin sea! This is what vacation dreams are made of! 💙',
+        'date': '2024-01-18',
+        'reply': 'We love seeing our guests living their best beach life! Thank you for sharing the joy! 🌊 - Resort Team'
+      },
+      {
+        'user': 'Ahmed S.',
+        'rating': 5,
+        'comment': '🔥 Berbera hits DIFFERENT! The energy here is unmatched - from the bustling port vibes to the serene beach moments. Every corner tells a story. This coastal gem stole my heart! Can\'t wait to come back! 💎',
+        'date': '2024-01-20',
+        'reply': 'Ahmed, you totally get what makes Berbera special! Come back soon - the sea is always calling! 🌊 - Management'
       }
     ],
     'Berbera Port Services': [
       {
         'user': 'Omar S.',
         'rating': 4,
-        'comment': 'Efficient port services and good communication.',
+        'comment': '⚓ Super efficient port operations! The logistics team knows their stuff. Communication was on point and everything flowed smoothly. Professional vibes all around! 📦',
         'date': '2024-01-12',
-        'reply': 'Thank you Omar! We appreciate your review. - Port Team'
+        'reply': 'Thank you Omar! Smooth sailing is what we aim for! ⛵ - Port Team'
+      },
+      {
+        'user': 'Maryam H.',
+        'rating': 5,
+        'comment': '🚢 Wow! The historical significance of this port is mind-blowing! Standing where ancient traders once stood, watching modern ships come and go - it\'s like time traveling! The guided tour was absolutely fascinating! 🕰️',
+        'date': '2024-01-14',
+        'reply': 'We\'re passionate about sharing Berbera\'s rich maritime heritage! Thank you for appreciating our history! 🏛️ - Cultural Tours Team'
+      }
+    ],
+    'Swimming & Beach Sports': [
+      {
+        'user': 'Layla M.',
+        'rating': 5,
+        'comment': '🏐 Beach volleyball sessions were EPIC! The sand, the sun, the competition - everything was perfect! Made so many new friends and had a blast. This is how you spend a perfect day by the sea! 🌞',
+        'date': '2024-01-16',
+        'reply': 'That\'s the Berbera beach spirit! Come join us again for more epic games! 🏐 - Beach Sports Coordinator'
+      },
+      {
+        'user': 'Hassan K.',
+        'rating': 5,
+        'comment': '🌊 The water is INCREDIBLE! So warm and inviting, perfect for swimming laps. Felt so refreshed and energized after my morning swim. The Gulf of Aden really is a natural treasure! 💪',
+        'date': '2024-01-17',
+        'reply': 'Nothing beats a morning swim in our beautiful waters! Thanks for sharing the energy! 🏊‍♂️ - Beach Activities Team'
+      }
+    ],
+    'Fishing Tours': [
+      {
+        'user': 'Yusuf A.',
+        'rating': 5,
+        'comment': '🎣 BEST fishing experience ever! The local fishermen are legends - taught me techniques passed down for generations. Caught the biggest fish of my life! The stories, the laughs, the fresh catch BBQ on the beach - UNFORGETTABLE! 🐟🔥',
+        'date': '2024-01-19',
+        'reply': 'You\'re now part of the Berbera fishing family! Those memories will last a lifetime! 🎣 - Fishing Tours Captain'
       }
     ]
   };
@@ -42,37 +88,37 @@ class _BerberaPageState extends State<BerberaPage> {
   // Hotel data
   final List<Map<String, dynamic>> _hotels = [
     {
-      'name': 'Berbera Beach Resort',
-      'description': 'Luxury beachfront resort with stunning views of the Gulf of Aden.',
+      'name': '🏖️ Berbera Beach Resort',
+      'description': '✨ Pure luxury meets coastal magic! Wake up to breathtaking sunrises over the Gulf of Aden, where golden sands meet turquoise waters. Every room is a front-row seat to paradise - this is where dreams check in and never want to leave! 🌅💎',
       'price': '\$120/night',
       'rating': '4.9',
       'address': 'Beach Road, Berbera',
       'contact': '+252 63 4567890',
       'website': 'https://berberabeachresort.com',
       'image': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
-      'amenities': ['Beach Access', 'Pool', 'Restaurant', 'Spa', 'Water Sports', 'Wi-Fi'],
+      'amenities': ['🏖️ Beach Access', '🏊‍♀️ Pool', '🍽️ Restaurant', '💆‍♀️ Spa', '🏄‍♂️ Water Sports', '📶 Wi-Fi'],
     },
     {
-      'name': 'Damal Hotel Berbera',
-      'description': 'Modern hotel near the port with business facilities and comfortable rooms.',
+      'name': '🏢 Damal Hotel Berbera',
+      'description': '🌟 Where business meets coastal charm! Perfectly positioned to capture the dynamic energy of Berbera\'s bustling port district. Modern comfort with a touch of maritime heritage - ideal for the savvy traveler who appreciates both efficiency and atmosphere! ⚓💼',
       'price': '\$75/night',
       'rating': '4.6',
       'address': 'Port District, Berbera',
       'contact': '+252 63 4455666',
       'website': 'https://www.damalhotels.com',
       'image': 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
-      'amenities': ['Wi-Fi', 'Restaurant', 'Business Center', 'Conference Room', 'Airport Shuttle'],
+      'amenities': ['📶 Wi-Fi', '🍽️ Restaurant', '💼 Business Center', '🏛️ Conference Room', '✈️ Airport Shuttle'],
     },
     {
-      'name': 'Port View Hotel',
-      'description': 'Cozy hotel with panoramic views of the historic port.',
+      'name': '🌅 Port View Hotel',
+      'description': '🎭 Your window to Berbera\'s living theater! Watch the mesmerizing dance of ships, feel the pulse of maritime life, and soak in stories that span centuries. Cozy comfort meets epic views - this is where travelers become storytellers! 🚢📖',
       'price': '\$60/night',
       'rating': '4.3',
       'address': 'Harbor Street, Berbera',
       'contact': '+252 63 4567891',
       'website': 'https://portviewberbera.com',
       'image': 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
-      'amenities': ['Port View', 'Restaurant', 'Bar', 'Wi-Fi', 'Local Tours'],
+      'amenities': ['🌊 Port View', '🍽️ Restaurant', '🍹 Bar', '📶 Wi-Fi', '🗺️ Local Tours'],
     },
   ];
 
@@ -143,7 +189,7 @@ class _BerberaPageState extends State<BerberaPage> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Text(
-                        'PORT CITY',
+                        '🚢 VIBRANT PORT CITY ⚓',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -241,14 +287,14 @@ class _BerberaPageState extends State<BerberaPage> {
   Widget _buildBeachActivitiesSection() {
     final activities = [
       {
-        'name': 'Swimming & Beach Sports',
-        'description': 'Enjoy the beautiful beaches of Berbera with swimming, beach volleyball, and water sports.',
+        'name': '🏊‍♀️ Swimming & Beach Sports',
+        'description': '🌊 Dive into pure bliss! Feel the warm, crystal-clear waters of the Gulf of Aden embrace you! Join epic beach volleyball tournaments, surf the perfect waves, or simply float under the endless blue sky. This is where memories are made and souls are recharged! ✨🏐',
         'price': 'Free - \$15',
         'image': 'https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
       },
       {
-        'name': 'Fishing Tours',
-        'description': 'Experience traditional fishing with local fishermen along the Berbera coastline.',
+        'name': '🎣 Traditional Fishing Tours',
+        'description': '🐟 Join the legendary fishermen of Berbera for an authentic adventure! Learn ancient techniques passed down through generations, feel the thrill of the catch, and enjoy fresh BBQ on the beach. It\'s not just fishing - it\'s connecting with the soul of the sea! 🌅⚓',
         'price': '\$25 - \$50',
         'image': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
       }
@@ -353,8 +399,8 @@ class _BerberaPageState extends State<BerberaPage> {
   Widget _buildPortServicesSection() {
     final services = [
       {
-        'name': 'Berbera Port Authority',
-        'description': 'Main port services including cargo handling, ship maintenance, and maritime logistics.',
+        'name': '⚓ Berbera Port Authority',
+        'description': '🚢 Step into history at one of the Horn of Africa\'s most iconic ports! Experience the pulse of international trade where ancient maritime routes meet modern logistics. Watch massive ships dance in the harbor while feeling the energy of a port that has connected worlds for centuries! 🌍✨',
         'contact': '+252 63 456 7890',
         'image': 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
       }
@@ -703,13 +749,16 @@ class _BerberaPageState extends State<BerberaPage> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              // TODO: Implement feedback submission
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Thank you for your feedback!')),
-              );
-            },
+                          onPressed: () {
+                // TODO: Implement feedback submission
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('🌊 Thank you for sharing your Berbera vibes! Your feedback helps keep the coastal magic alive! ✨'),
+                    duration: Duration(seconds: 4),
+                  ),
+                );
+              },
             child: const Text('Submit'),
           ),
         ],
@@ -735,7 +784,7 @@ class _BerberaPageState extends State<BerberaPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Recent Reviews',
+            '💬 What Travelers Are Saying About Berbera! 🌟',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,

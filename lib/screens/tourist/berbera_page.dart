@@ -40,6 +40,20 @@ class _BerberaPageState extends State<BerberaPage> {
         'comment': '🔥 Berbera hits DIFFERENT! The energy here is unmatched - from the bustling port vibes to the serene beach moments. Every corner tells a story. This coastal gem stole my heart! Can\'t wait to come back! 💎',
         'date': '2024-01-20',
         'reply': 'Ahmed, you totally get what makes Berbera special! Come back soon - the sea is always calling! 🌊 - Management'
+      },
+      {
+        'user': 'Khadija L.',
+        'rating': 5,
+        'comment': '💫 The hospitality here is OUT OF THIS WORLD! From the moment I arrived, everyone made me feel like family. The staff remembers your name, your favorite drink, everything! This isn\'t just a hotel - it\'s a home away from home with million-dollar views! 🏡❤️',
+        'date': '2024-01-22',
+        'reply': 'Khadija, you ARE family now! Your smile brightened our days too! Can\'t wait to welcome you back! 🤗 - Resort Family'
+      },
+      {
+        'user': 'Ibrahim D.',
+        'rating': 5,
+        'comment': '🌊 The sound of waves literally put me to sleep every night! Woke up to dolphins playing right outside my window - NO JOKE! This place is like a real-life nature documentary! My stress just melted away with each tide! 🐬😴',
+        'date': '2024-01-23',
+        'reply': 'The dolphins love showing off for our guests! Nature\'s own welcome committee! 🐬✨ - Resort Team'
       }
     ],
     'Berbera Port Services': [
@@ -56,6 +70,13 @@ class _BerberaPageState extends State<BerberaPage> {
         'comment': '🚢 Wow! The historical significance of this port is mind-blowing! Standing where ancient traders once stood, watching modern ships come and go - it\'s like time traveling! The guided tour was absolutely fascinating! 🕰️',
         'date': '2024-01-14',
         'reply': 'We\'re passionate about sharing Berbera\'s rich maritime heritage! Thank you for appreciating our history! 🏛️ - Cultural Tours Team'
+      },
+      {
+        'user': 'Abdullahi M.',
+        'rating': 5,
+        'comment': '⚓ This port is ALIVE with energy! The symphony of ship horns, the dance of cranes, workers moving like a perfectly choreographed show - it\'s mesmerizing! You can literally FEEL the pulse of international trade! This is where the world connects! 🌍🎵',
+        'date': '2024-01-24',
+        'reply': 'You\'ve captured the heartbeat of Berbera perfectly! This port truly connects continents! ⚓🌊 - Port Authority'
       }
     ],
     'Swimming & Beach Sports': [
@@ -72,6 +93,20 @@ class _BerberaPageState extends State<BerberaPage> {
         'comment': '🌊 The water is INCREDIBLE! So warm and inviting, perfect for swimming laps. Felt so refreshed and energized after my morning swim. The Gulf of Aden really is a natural treasure! 💪',
         'date': '2024-01-17',
         'reply': 'Nothing beats a morning swim in our beautiful waters! Thanks for sharing the energy! 🏊‍♂️ - Beach Activities Team'
+      },
+      {
+        'user': 'Zara Y.',
+        'rating': 5,
+        'comment': '🏐 Beach vibes ON POINT! The volleyball tournaments were so much FUN! Met people from all over the world, laughed until my stomach hurt, and got the best tan of my life! This beach brings out everyone\'s inner child! Pure JOY! 🌞🤸‍♀️',
+        'date': '2024-01-25',
+        'reply': 'That\'s the Berbera magic - bringing people together through pure fun! See you at the next tournament! 🏐🎉 - Beach Sports Team'
+      },
+      {
+        'user': 'Mohamed R.',
+        'rating': 5,
+        'comment': '🏄‍♂️ DUDE! The waves here are PERFECT for beginners! Spent the whole day learning to surf and by sunset I was riding waves like a pro! The instructors are legends and the water feels like a warm hug! Living the DREAM! 🌊🤙',
+        'date': '2024-01-26',
+        'reply': 'You\'re a natural, Mohamed! The ocean chose you! Keep riding those waves! 🏄‍♂️🌊 - Surf Instructors'
       }
     ],
     'Fishing Tours': [
@@ -81,6 +116,20 @@ class _BerberaPageState extends State<BerberaPage> {
         'comment': '🎣 BEST fishing experience ever! The local fishermen are legends - taught me techniques passed down for generations. Caught the biggest fish of my life! The stories, the laughs, the fresh catch BBQ on the beach - UNFORGETTABLE! 🐟🔥',
         'date': '2024-01-19',
         'reply': 'You\'re now part of the Berbera fishing family! Those memories will last a lifetime! 🎣 - Fishing Tours Captain'
+      },
+      {
+        'user': 'Samira H.',
+        'rating': 5,
+        'comment': '🌅 Berbera at sunrise is PURE MAGIC! Woke up early and the beach was glowing golden, the sea was like liquid silk! Had the whole coastline to myself for a moment - felt like I owned paradise! This is what soul restoration looks like! ✨🧘‍♀️',
+        'date': '2024-01-21',
+        'reply': 'Those sunrise moments are truly special! You captured the essence of Berbera\'s morning magic! 🌄 - Beach Activities Team'
+      },
+      {
+        'user': 'Ali K.',
+        'rating': 5,
+        'comment': '🎣 FISHING GOALS ACHIEVED! Captain Mahmoud took us to his secret spots where the fish were practically jumping into the boat! The stories he shared about his 30 years on these waters gave me CHILLS! Fresh grilled catch with sunset views - this is LIVING! 🐟🌅',
+        'date': '2024-01-27',
+        'reply': 'Captain Mahmoud is our treasure! Those secret spots are pure gold! Thanks for appreciating the tradition! 🎣⚓ - Fishing Tours Team'
       }
     ]
   };

@@ -35,11 +35,6 @@ class _BoramaPageState extends State<BoramaPage> {
                   FutureBuilder<String?>(
                     future: _firstExistingAsset([
                       'assets/images/image/borama.jpeg',
-                      'assets/images/image/borama.jpg',
-                      'assets/images/image/borama.png',
-                      'assets/images/borama_cover.jpg',
-                      'assets/images/borama_cover.jpeg',
-                      'assets/images/borama_cover.png',
                     ]),
                     builder: (context, snapshot) {
                       final path = snapshot.data;

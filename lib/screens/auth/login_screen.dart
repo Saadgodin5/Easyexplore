@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/user_model.dart';
-import '../../utils/app_theme.dart';
 import '../../widgets/custom_button.dart';
-import '../../widgets/custom_text_field.dart';
+import '../../widgets/custom_card.dart';
+import '../../utils/app_theme.dart';
 import '../tourist/tourist_dashboard.dart';
+import '../provider/provider_dashboard.dart';
+import '../feature_showcase_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,164 +16,271 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen>
+    with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  UserRole _selectedRole = UserRole.tourist;
-  bool _isSignUp = false;
   final _nameController = TextEditingController();
+  
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+  
+  bool _isLoginMode = true;
+  bool _obscurePassword = true;
+  UserRole _selectedRole = UserRole.tourist;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,
+    ));
+
+    _animationController.forward();
+  }
 
   @override
   void dispose() {
+    _animationController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _nameController.dispose();
     super.dispose();
   }
 
-  Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    bool success;
-
-    if (_isSignUp) {
-      success = await authProvider.signUp(
-        _emailController.text.trim(),
-        _passwordController.text,
-        _nameController.text.trim(),
-        _selectedRole,
-      );
-    } else {
-      success = await authProvider.signIn(
-        _emailController.text.trim(),
-        _passwordController.text,
-      );
-    }
-
-    if (!success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(authProvider.error ?? 'Authentication failed'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
-  void _toggleMode() {
-    setState(() {
-      _isSignUp = !_isSignUp;
-      _formKey.currentState?.reset();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: AppTheme.heroGradient,
+        ),
+        child: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
+            padding: const EdgeInsets.all(20),
+            child: AnimatedBuilder(
+              animation: _animationController,
+              builder: (context, child) {
+                return FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 60),
-                
-                // Logo and Title
-                Center(
-                  child: Column(
+                        const SizedBox(height: 40),
+                        
+                        // Header
+                        _buildHeader(),
+                        
+                        const SizedBox(height: 40),
+                        
+                        // Login/Register Form
+                        _buildForm(),
+                        
+                        const SizedBox(height: 30),
+                        
+                        // Demo accounts
+                        _buildDemoAccounts(),
+                        
+                        const SizedBox(height: 20),
+                        
+                        // Guest mode option
+                        _buildGuestModeOption(),
+                        
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
                     children: [
+        // App Logo
                       Container(
-                        width: 80,
-                        height: 80,
+          width: 100,
+          height: 100,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
-                          borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(25),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
                         ),
                         child: Icon(
                           Icons.explore,
-                          size: 40,
+            size: 50,
+            color: AppTheme.primaryColor,
+          ),
+        ),
+        
+        const SizedBox(height: 24),
+        
+        // App Name
+        const Text(
+          'ExploreEase',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.5,
+          ),
+        ),
+        
+        const SizedBox(height: 8),
+        
+        // Tagline
+        Text(
+          'Your Smart Travel Companion',
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.9),
+            fontSize: 16,
+            letterSpacing: 0.5,
+          ),
+        ),
+        
+        const SizedBox(height: 16),
+        
+        // Mode indicator
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            _isLoginMode ? 'Welcome Back!' : 'Join Our Community',
+            style: const TextStyle(
                           color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildForm() {
+    return CustomCard(
+      padding: const EdgeInsets.all(24),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Mode toggle
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _isLoginMode = true),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: _isLoginMode 
+                            ? AppTheme.primaryColor 
+                            : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Sign In',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: _isLoginMode ? Colors.white : Colors.grey[600],
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'ExploreEase',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _isSignUp ? 'Create your account' : 'Welcome back!',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                                      color: AppTheme.withOpacity(Theme.of(context).colorScheme.onSurface, 0.7),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
-                
-                const SizedBox(height: 48),
-                
-                // Form Fields
-                if (_isSignUp) ...[
-                  CustomTextField(
+                const SizedBox(width: 12),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _isLoginMode = false),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: !_isLoginMode 
+                            ? AppTheme.primaryColor 
+                            : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Sign Up',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: !_isLoginMode ? Colors.white : Colors.grey[600],
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Name field (for sign up)
+            if (!_isLoginMode) ...[
+              TextFormField(
                     controller: _nameController,
+                decoration: const InputDecoration(
                     labelText: 'Full Name',
-                    prefixIcon: Icons.person,
+                  prefixIcon: Icon(Icons.person),
+                ),
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
+                  if (value == null || value.isEmpty) {
                         return 'Please enter your name';
                       }
                       return null;
                     },
                   ),
                   const SizedBox(height: 16),
-                  
-                  // Role Selection
-                  DropdownButtonFormField<UserRole>(
-                    value: _selectedRole,
-                    decoration: InputDecoration(
-                      labelText: 'I am a',
-                      prefixIcon: const Icon(Icons.work),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[50],
-                    ),
-                    items: UserRole.values
-                        .where((role) => role != UserRole.admin)
-                        .map((role) => DropdownMenuItem(
-                              value: role,
-                              child: Text(
-                                role == UserRole.tourist ? 'Tourist' : 'Service Provider',
-                              ),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          _selectedRole = value;
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                ],
-                
-                CustomTextField(
+            ],
+            
+            // Email field
+            TextFormField(
                   controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
                   labelText: 'Email',
-                  prefixIcon: Icons.email,
-                  keyboardType: TextInputType.emailAddress,
+                prefixIcon: Icon(Icons.email),
+              ),
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
+                if (value == null || value.isEmpty) {
                       return 'Please enter your email';
                     }
                     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
@@ -183,11 +292,24 @@ class _LoginScreenState extends State<LoginScreen> {
                 
                 const SizedBox(height: 16),
                 
-                CustomTextField(
+            // Password field
+            TextFormField(
                   controller: _passwordController,
+              obscureText: _obscurePassword,
+              decoration: InputDecoration(
                   labelText: 'Password',
-                  prefixIcon: Icons.lock,
-                  obscureText: true,
+                prefixIcon: const Icon(Icons.lock),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                ),
+              ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
@@ -199,142 +321,348 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
                 
-                const SizedBox(height: 24),
-                
-                // Submit Button
-                Consumer<AuthProvider>(
-                  builder: (context, authProvider, child) {
-                    return CustomButton(
-                      onPressed: authProvider.isLoading ? null : _submitForm,
-                      child: authProvider.isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : Text(
-                              _isSignUp ? 'Sign Up' : 'Sign In',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                    );
-                  },
+            const SizedBox(height: 16),
+            
+            // Role selection (for sign up)
+            if (!_isLoginMode) ...[
+              const Text(
+                'Account Type',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                 ),
-                
-                const SizedBox(height: 24),
-                
-                // Demo Credentials (for MVP)
-                if (!_isSignUp) ...[
-                  Container(
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedRole = UserRole.tourist),
+                      child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue[200]!),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Demo Credentials:',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue[700],
+                          color: _selectedRole == UserRole.tourist 
+                              ? AppTheme.primaryColor.withValues(alpha: 0.1)
+                              : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: _selectedRole == UserRole.tourist 
+                                ? AppTheme.primaryColor
+                                : Colors.grey[300]!,
+                            width: 2,
                           ),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.explore,
+                              color: _selectedRole == UserRole.tourist 
+                                  ? AppTheme.primaryColor
+                                  : Colors.grey[600],
+                              size: 32,
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Your Account: saadgidin2@gmail.com / Ibrahim09871\nTourist: tourist@example.com / password\nProvider: provider@example.com / password',
+                              'Tourist',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: _selectedRole == UserRole.tourist 
+                                    ? AppTheme.primaryColor
+                                    : Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Explore destinations',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.blue[600],
+                                color: Colors.grey[600],
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                ],
-                
-                // Toggle Mode
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _isSignUp
-                          ? 'Already have an account? '
-                          : 'Don\'t have an account? ',
-                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
-                    TextButton(
-                      onPressed: _toggleMode,
-                      child: Text(
-                        _isSignUp ? 'Sign In' : 'Sign Up',
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _selectedRole = UserRole.provider),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: _selectedRole == UserRole.provider 
+                              ? AppTheme.primaryColor.withValues(alpha: 0.1)
+                              : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: _selectedRole == UserRole.provider 
+                                ? AppTheme.primaryColor
+                                : Colors.grey[300]!,
+                            width: 2,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.business,
+                              color: _selectedRole == UserRole.provider 
+                                  ? AppTheme.primaryColor
+                                  : Colors.grey[600],
+                              size: 32,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Provider',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: _selectedRole == UserRole.provider 
+                                    ? AppTheme.primaryColor
+                                    : Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Manage services',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                
                 const SizedBox(height: 24),
+            ],
                 
-                // Continue as Guest Button
+            // Submit button
                 Consumer<AuthProvider>(
                   builder: (context, authProvider, child) {
-                    return SizedBox(
+                return CustomButton(
+                  onPressed: authProvider.isLoading ? null : _handleSubmit,
+                  isLoading: authProvider.isLoading,
                       width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: authProvider.isLoading ? null : () async {
-                          final navigator = Navigator.of(context);
-                          await authProvider.enterGuestMode();
-                          if (mounted) {
-                            navigator.pushReplacement(
-                              MaterialPageRoute(
-                                builder: (_) => const TouristDashboard(),
-                              ),
-                            );
-                          }
-                        },
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: BorderSide(
-                            color: AppTheme.withOpacity(Theme.of(context).colorScheme.primary, 0.5),
-                          ),
-                          shape: RoundedRectangleBorder(
+                  child: Text(_isLoginMode ? 'Sign In' : 'Create Account'),
+                );
+              },
+            ),
+            
+            // Error message
+            Consumer<AuthProvider>(
+              builder: (context, authProvider, child) {
+                if (authProvider.error != null) {
+                  return Container(
+                    margin: const EdgeInsets.only(top: 16),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red[50],
                             borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.red[200]!),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.error, color: Colors.red[600], size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            authProvider.error!,
+                            style: TextStyle(color: Colors.red[600]),
                           ),
                         ),
-                        child: authProvider.isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                                ),
-                              )
-                            : Text(
-                                'Continue as Guest',
+                      ],
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDemoAccounts() {
+    return CustomCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Demo Accounts',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                      ),
-                    );
-                  },
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          _buildDemoAccountCard(
+            'Tourist Account',
+            'tourist@example.com',
+            'password',
+            Icons.explore,
+            Colors.blue,
+          ),
+          
+          const SizedBox(height: 8),
+          
+          _buildDemoAccountCard(
+            'Provider Account',
+            'provider@example.com',
+            'password',
+            Icons.business,
+            Colors.green,
+          ),
+          
+          const SizedBox(height: 8),
+          
+          _buildDemoAccountCard(
+            'Your Account',
+            'saadgidin2@gmail.com',
+            'Ibrahim09871',
+            Icons.person,
+            Colors.orange,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDemoAccountCard(String title, String email, String password, IconData icon, Color color) {
+    return GestureDetector(
+      onTap: () {
+        _emailController.text = email;
+        _passwordController.text = password;
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: color,
+                    ),
+                  ),
+                  Text(
+                    email,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
                 ),
               ],
             ),
           ),
+            Icon(
+              Icons.touch_app,
+              color: color,
+              size: 16,
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  Widget _buildGuestModeOption() {
+    return CustomCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Icon(
+            Icons.person_outline,
+            size: 32,
+            color: Colors.grey[600],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Just want to explore?',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Continue as a guest to browse destinations without creating an account',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 16),
+          CustomOutlinedButton(
+            onPressed: () async {
+              final authProvider = context.read<AuthProvider>();
+              await authProvider.enterGuestMode();
+              if (mounted) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const TouristDashboard(),
+                  ),
+                );
+              }
+            },
+            child: const Text('Continue as Guest'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleSubmit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final authProvider = context.read<AuthProvider>();
+    
+    bool success;
+    if (_isLoginMode) {
+      success = await authProvider.signIn(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+    } else {
+      success = await authProvider.signUp(
+        _emailController.text.trim(),
+        _passwordController.text,
+        _nameController.text.trim(),
+        _selectedRole,
+      );
+    }
+
+    if (success && mounted) {
+      final user = authProvider.currentUser!;
+      if (user.role == UserRole.tourist) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const TouristDashboard()),
+        );
+      } else if (user.role == UserRole.provider) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const ProviderDashboard()),
+        );
+      }
+    }
   }
 }

@@ -5,7 +5,10 @@ import 'providers/auth_provider.dart';
 import 'providers/booking_provider.dart';
 import 'providers/itinerary_provider.dart';
 import 'providers/somaliland_guide_provider.dart';
+import 'providers/provider_management_provider.dart';
+import 'providers/social_provider.dart';
 import 'screens/splash_screen.dart';
+import 'screens/feature_showcase_screen.dart';
 import 'utils/app_theme.dart';
 
 void main() async {
@@ -28,14 +31,19 @@ class ExploreEaseApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => BookingProvider()),
         ChangeNotifierProvider(create: (_) => ItineraryProvider()),
         ChangeNotifierProvider(create: (_) => SomalilandGuideProvider()),
+        ChangeNotifierProvider(create: (_) => ProviderManagementProvider()),
+        ChangeNotifierProvider(create: (_) => SocialProvider()),
       ],
       child: MaterialApp(
-        title: 'ExploreEase',
+        title: 'ExploreEase - Your Smart Travel Companion',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.system,
         home: const SplashScreen(),
+        routes: {
+          '/feature-showcase': (context) => const FeatureShowcaseScreen(),
+        },
       ),
     );
   }

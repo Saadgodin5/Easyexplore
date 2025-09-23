@@ -924,46 +924,39 @@ class _TouristDashboardState extends State<TouristDashboard> with TickerProvider
   }
 
   List<String> _imageCandidatesForCity(String cityName) {
-    final String lower = cityName.toLowerCase();
     // Keep Hargeisa dedicated cover (user already set)
     if (cityName == 'Hargeisa') {
       return [
         'assets/images/hargeisa_cover.jpg',
-        'assets/images/hargeisa_cover.jpeg',
-        'assets/images/hargeisa_cover.png',
         'assets/images/image/Hargeisa somaliland.jpeg',
       ];
     }
 
-    final List<String> candidates = [
-      // User-uploaded folder first
-      'assets/images/image/${lower}.jpeg',
-      'assets/images/image/${lower}.jpg',
-      'assets/images/image/${lower}.png',
-      // Project fallbacks
-      'assets/images/${lower}_cover.jpg',
-      'assets/images/${lower}_cover.jpeg',
-      'assets/images/${lower}_cover.png',
-    ];
+    final List<String> candidates = [];
+    final String lower = cityName.toLowerCase();
 
-    // Special filename cases found in assets/images/image/
-    if (cityName == 'Cerigabo') {
-      candidates.insertAll(0, [
-        'assets/images/image/erigabo.jpeg',
-        'assets/images/image/erigabo.jpg',
-      ]);
-    }
-    if (cityName == 'Gabiley') {
-      candidates.insert(0, 'assets/images/image/Gabiley.jpeg');
-    }
-    if (cityName == 'Berbera') {
-      candidates.insert(0, 'assets/images/image/berbera.jpeg');
-    }
-    if (cityName == 'Borama') {
-      candidates.insert(0, 'assets/images/image/borama.jpeg');
-    }
-    if (cityName == 'Burco') {
-      candidates.insert(0, 'assets/images/image/burco.jpeg');
+    // Special filename cases found in assets/images/image/ - use exact matches only
+    switch (cityName) {
+      case 'Cerigabo':
+        candidates.add('assets/images/image/erigabo.jpeg');
+        break;
+      case 'Gabiley':
+        candidates.add('assets/images/image/Gabiley.jpeg');
+        break;
+      case 'Berbera':
+        candidates.add('assets/images/image/berbera.jpeg');
+        break;
+      case 'Borama':
+        candidates.add('assets/images/image/borama.jpeg');
+        break;
+      case 'Burco':
+        candidates.add('assets/images/image/burco.jpeg');
+        break;
+      default:
+        // For any other cities, use lowercase versions
+        candidates.add('assets/images/image/${lower}.jpeg');
+        candidates.add('assets/images/image/${lower}.jpg');
+        break;
     }
 
     return candidates;

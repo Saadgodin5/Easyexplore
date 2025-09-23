@@ -148,11 +148,6 @@ class _BerberaPageState extends State<BerberaPage> {
                   FutureBuilder<String?>(
                     future: _firstExistingAsset([
                       'assets/images/image/berbera.jpeg',
-                      'assets/images/image/berbera.jpg',
-                      'assets/images/image/berbera.png',
-                      'assets/images/berbera_cover.jpg',
-                      'assets/images/berbera_cover.jpeg',
-                      'assets/images/berbera_cover.png',
                     ]),
                     builder: (context, snapshot) {
                       final path = snapshot.data;

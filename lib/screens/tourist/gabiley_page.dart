@@ -35,12 +35,6 @@ class _GabileyPageState extends State<GabileyPage> {
                   FutureBuilder<String?>(
                     future: _firstExistingAsset([
                       'assets/images/image/Gabiley.jpeg',
-                      'assets/images/image/gabiley.jpeg',
-                      'assets/images/image/gabiley.jpg',
-                      'assets/images/image/gabiley.png',
-                      'assets/images/gabiley_cover.jpg',
-                      'assets/images/gabiley_cover.jpeg',
-                      'assets/images/gabiley_cover.png',
                     ]),
                     builder: (context, snapshot) {
                       final path = snapshot.data;

@@ -916,8 +916,6 @@ class _HargeisaPageState extends State<HargeisaPage> {
   Widget _buildHeaderAssetOrPlaceholder() {
             const List<String> candidates = [
           'assets/images/hargeisa_cover.jpg',
-          'assets/images/hargeisa_cover.jpeg',
-          'assets/images/hargeisa_cover.png',
         ];
     return FutureBuilder<String?>(
       future: _firstExistingAsset(candidates),

@@ -35,11 +35,6 @@ class _BurcoPageState extends State<BurcoPage> {
                   FutureBuilder<String?>(
                     future: _firstExistingAsset([
                       'assets/images/image/burco.jpeg',
-                      'assets/images/image/burco.jpg',
-                      'assets/images/image/burco.png',
-                      'assets/images/burco_cover.jpg',
-                      'assets/images/burco_cover.jpeg',
-                      'assets/images/burco_cover.png',
                     ]),
                     builder: (context, snapshot) {
                       final path = snapshot.data;

@@ -35,13 +35,6 @@ class _CerigaboPageState extends State<CerigaboPage> {
                   FutureBuilder<String?>(
                     future: _firstExistingAsset([
                       'assets/images/image/erigabo.jpeg',
-                      'assets/images/image/erigabo.jpg',
-                      'assets/images/image/cerigabo.jpeg',
-                      'assets/images/image/cerigabo.jpg',
-                      'assets/images/image/cerigabo.png',
-                      'assets/images/cerigabo_cover.jpg',
-                      'assets/images/cerigabo_cover.jpeg',
-                      'assets/images/cerigabo_cover.png',
                     ]),
                     builder: (context, snapshot) {
                       final path = snapshot.data;
